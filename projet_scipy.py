@@ -141,11 +141,11 @@ def contour(f, c=0.0, xc=[0.0,1.0], yc=[0.0,1.0], delta=0.01):
 import time
 
 top = time.time()
-for c in [-1.5,-1.,-0.5,0,0.5,1.,1.5]:
+for i,c in enumerate([-1.5,-1.,-0.5,0,0.5,1.,1.5]):
     xc, yc = np.linspace(-2.,3.,20), np.linspace(-1.,2.,20)
     xs, ys = contour(f,c,xc,yc)
-    
     for x,y in zip(xs,ys):
-        plt.plot(x,y,'-b', label ='c=5')
+        plt.plot(x,y,'b')
+
 print(time.time()-top)
 plt.show()
