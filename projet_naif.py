@@ -74,16 +74,24 @@ def contour(f, c=0.0, xc=[0.0,1.0], yc=[0.0,1.0], delta=0.01):
 from math import *
 
 def f(x,y):
-    return(2*(exp(-x**2-y**2)-exp(-(x-1)**2-(y-1)**2)))
+    """
+    fonction test
+    """
+    res = 2*(np.exp(-np.power(x,2)-np.power(y,2))-np.exp(-np.power(x-1,2)-np.power(y-1,2)))
+    return(res)
 
 def g(x,y):
     return(sqrt(x**2+y**2))
 
 import matplotlib.pyplot as plt
-for c in [-1.5,-1,-0.5,0,0.5,1,1.5]:
-    xc, yc = np.linspace(-2.,3.,10), np.linspace(-1.,2.,10)
+import time
+
+top = time.time()
+for c in [-1.5,-1.,-0.5,0,0.5,1.,1.5]:
+    xc, yc = np.linspace(-2.,3.,25), np.linspace(-1.,2.,25)
     xs, ys = contour(f,c,xc,yc)
+    
     for x,y in zip(xs,ys):
         plt.plot(x,y,'-b', label ='c=5')
+print(time.time()-top)
 plt.show()
-

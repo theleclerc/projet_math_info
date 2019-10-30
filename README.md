@@ -2,4 +2,6 @@ projet_naif.py utilise une méthode de dichotomie point par point afin de trouve
 
 projet_MI_final.html est le rendu final sous forme de notebook.
 
-projet_newton.py est le code utilisant une méthode Newton en 2D pour trouver la courbe de niveau.
+projet_newton.py est le code utilisant une méthode Newton en 2D en se déplaçant sur la courbe de niveau pour la trouver.
+
+projet_scipy.py est le code utilisant une méthode de Newton (de scipy.optimize) 1D en se déplaçant sur la courbe de niveau pour la trouver.
