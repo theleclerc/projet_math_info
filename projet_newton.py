@@ -87,26 +87,29 @@ def newton_2D(f, x0, y0, fx = 0, fy = 0, eps = 2**(-26)):
                     [y0]])
     im = np.array([[imx],
                     [imy]])
-    while max(abs(imx - fx), abs(imy - fy)) > eps:
-        J = J_f(x0,y0)
-        a,b,c,d = J[0,0],J[0,1],J[1,0],J[1,1]
-        #test inversibilite de J
-        if a*d-b*c == 0:
-            raise ValueError("matrice non inversible")
-        pos = pos + np.dot(np.linalg.inv(J),c-im)
-        x0,y0 = pos[0][0],pos[1][0]
-        imx,imy = f(x0,y0)[0], f(x0,y0)[1]
-        pos = np.array([[x0],
-                    [y0]])
-        im = np.array([[imx],
-                    [imy]])
-    
+    try:
+        while max(abs(imx - fx), abs(imy - fy)) > eps:
+            J = J_f(x0,y0)
+            a,b,c,d = J[0,0],J[0,1],J[1,0],J[1,1]
+            #test inversibilite de J
+            if a*d-b*c == 0:
+                raise ValueError("matrice non inversible")
+            pos = pos + np.dot(np.linalg.inv(J),c-im)
+            x0,y0 = pos[0][0],pos[1][0]
+            imx,imy = f(x0,y0)[0], f(x0,y0)[1]
+            pos = np.array([[x0],
+                            [y0]])
+            im = np.array([[imx],
+                            [imy]])
+    except ValueError :
+        return(x0,y0)
     return(x0,y0)
 
 def simple_contour(f,c=0.0,delta = 0.01):
     """
     renvoie une partie de courbe de niveau
     """
+    maxiter = int(10/delta)
     x,y = [],[]
     exist_seed = False
     i = 0
@@ -120,26 +123,38 @@ def simple_contour(f,c=0.0,delta = 0.01):
             x.append(i*delta)
             y.append(yi)
             exist_seed = True
-    xc, yc = x[-1], y[-1]
-    try:
-#        N = 0
-        while True:
-            grad = grad_f(f,xc,yc)
-            tangent = np.array([-grad[1],grad[0]])/np.power(grad[0]**2 + grad[1]**2,1/2)*delta
-            x0, y0 = xc + tangent[0], yc + tangent[1]
-            def F(x,y):
-                return np.array([f(x,y),np.power(x-x0,2)+np.power(y-y0,2)])
-            xc, yc = newton_2D(F, x0, y0, fx = c, fy = delta**2)
-            if xc<0 or xc>1 or yc<0 or yc >1:
-                return(np.array(x),np.array(y))
-            x.append(xc)
-            y.append(yc)
-#            N += 1
-#            if N > 1000:
-#                return(np.array(x),np.array(y))
-    except ValueError as e:
-        print(e)
-        return(np.array(x),np.array(y))
+    Xc, Yc = x[-1], y[-1]
+    xc,yc = Xc, Yc
+    N = 0
+    while N<maxiter:
+        grad = grad_f(f,xc,yc)
+        tangent = np.array([-grad[1],grad[0]])/np.power(grad[0]**2 + grad[1]**2,1/2)*delta
+        x0, y0 = xc + tangent[0], yc + tangent[1]
+        def F(x,y):
+            return np.array([f(x,y),np.power(x-x0,2)+np.power(y-y0,2)])
+        xc, yc = newton_2D(F, x0, y0, fx = c, fy = delta**2)
+        if xc<0 or xc>1 or yc<0 or yc >1:
+            N = maxiter
+        x.append(xc)
+        y.append(yc)
+        N += 1
+    x.reverse()
+    y.reverse()
+    xc,yc = Xc, Yc
+    N = 0
+    while N<maxiter:
+        grad = grad_f(f,xc,yc)
+        tangent = np.array([grad[1],-grad[0]])/np.power(grad[0]**2 + grad[1]**2,1/2)*delta
+        x0, y0 = xc + tangent[0], yc + tangent[1]
+        def F(x,y):
+            return np.array([f(x,y),np.power(x-x0,2)+np.power(y-y0,2)])
+        xc, yc = newton_2D(F, x0, y0, fx = c, fy = delta**2)
+        if xc<0 or xc>1 or yc<0 or yc >1:
+            N = maxiter
+        x.append(xc)
+        y.append(yc)
+        N += 1
+    return(np.array(x),np.array(y))
 
 def contour(f, c=0.0, xc=[0.0,1.0], yc=[0.0,1.0], delta=0.01):
     """
@@ -172,10 +187,10 @@ def g(x,y):
     return(np.power((np.power(x,2)+np.power(y,2)),1),np.power(x,3))
 
 
-for c in [1]:
+for c in [-1.5,-1.,-0.5,0,0.5,1.,1.5]:
     xc, yc = np.linspace(-2.,3.,10), np.linspace(-1.,2.,10)
     xs, ys = contour(f,c,xc,yc,delta=0.001)
     
     for x,y in zip(xs,ys):
-        plt.plot(x,y,'-ob', label ='c=5')
+        plt.plot(x,y,'-b', label ='c=5')
 plt.show()
